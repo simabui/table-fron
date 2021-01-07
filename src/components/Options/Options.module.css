@@ -1,0 +1,12 @@
+.form > .row {
+  justify-content: space-around;
+  align-items: center;
+}
+.disabledInput {
+  width: 140px;
+}
+.cell {
+  flex-basis: 33.3333%;
+  flex-grow: 0;
+  flex-shrink: 0;
+}

@@ -1,24 +1,27 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import React, { useEffect, useState, lazy, Suspense } from 'react';
+import React, { useEffect, useState } from 'react';
 import Loader from './Loader/Loader';
+import Options from './Options/Options';
+import Data from './Data/Data';
 import API from '../api/agent';
-
-const AsyncOptions = lazy(() =>
-  import(/* webpackChunkName: "options" */ './Options/Options'),
-);
-const AsyncData = lazy(() =>
-  import(/* webpackChunkName: "data" */ './Data/Data'),
-);
 
 const App = () => {
   const [stat, setState] = useState([]);
   const [filteredState, setfilteredState] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
-      const data = await API.Stat.getStats();
-      setState(data);
+      try {
+        setLoading(true);
+        const data = await API.Stat.getStats();
+        setState(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, []);
@@ -53,12 +56,9 @@ const App = () => {
           <h1>Історія розміщення моєї інформації</h1>
           <p>Увага були внесені зміни до Договору публічної оферти.</p>
         </div>
-        <Suspense fallback={<Loader />}>
-          {stat.length > 1 && (
-            <AsyncOptions stat={stat} handleFilter={handleFilter} />
-          )}
-          <AsyncData info={filteredState} />
-        </Suspense>
+        <Loader isLoading={isLoading} />
+        {stat.length > 1 && <Options stat={stat} handleFilter={handleFilter} />}
+        <Data info={filteredState} />
       </div>
     </>
   );
